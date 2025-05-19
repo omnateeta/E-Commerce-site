@@ -1,4 +1,4 @@
-# MERN E-commerce Platform
+# E-Commerce-site
 
 A full-stack e-commerce platform built with the MERN stack (MongoDB, Express.js, React.js, Node.js).
 
@@ -33,8 +33,8 @@ A full-stack e-commerce platform built with the MERN stack (MongoDB, Express.js,
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/mern-ecommerce.git
-cd mern-ecommerce
+git clone https://github.com/omnateeta/E-Commerce-site.git
+cd E-Commerce-site
 ```
 
 2. Install dependencies for both client and server:
@@ -68,7 +68,7 @@ npm run dev
 ## Project Structure
 
 ```
-mern-ecommerce/
+E-Commerce-site/
 ├── client/                 # Frontend React application
 │   ├── src/
 │   │   ├── components/    # Reusable components
