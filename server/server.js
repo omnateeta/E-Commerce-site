@@ -31,7 +31,13 @@ mongoose
 // Middleware
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: [
+      'http://localhost:5173',
+      'https://e-commerce-site-frontend.vercel.app',
+      'https://e-commerce-site.vercel.app',
+      'https://ecommerce-frontend.vercel.app',
+      'https://ecommerce_site_frontend.vercel.app'
+    ],
     methods: ["GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"],
     exposedHeaders: ["Set-Cookie"],
