@@ -31,17 +31,28 @@ mongoose
 // Middleware
 app.use(
   cors({
-    origin: [
-      'http://localhost:5173',
-      'https://e-commerce-site-frontend.vercel.app',
-      'https://e-commerce-site.vercel.app',
-      'https://ecommerce-frontend.vercel.app',
-      'https://ecommerce_site_frontend.vercel.app',
-      'https://ecommercefrontend-ten-ochre.vercel.app',
-      'https://ecommercefrontend-ten-ochre.vercel.app/*'
-    ],
+    origin: function(origin, callback) {
+      console.log("CORS request from origin:", origin);
+      const allowedOrigins = [
+        'http://localhost:5173',
+        'https://e-commerce-site-frontend.vercel.app',
+        'https://e-commerce-site.vercel.app',
+        'https://ecommerce-frontend.vercel.app',
+        'https://ecommerce_site_frontend.vercel.app',
+        'https://ecommercefrontend-ten-ochre.vercel.app'
+      ];
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.indexOf(origin) === -1) {
+        console.log("CORS blocked for origin:", origin);
+        const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+        return callback(new Error(msg), false);
+      }
+      console.log("CORS allowed for origin:", origin);
+      return callback(null, true);
+    },
     methods: ["GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept", "Origin"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept", "Origin", "Cookie"],
     exposedHeaders: ["Set-Cookie"],
     credentials: true,
     maxAge: 86400, // 24 hours
@@ -52,10 +63,16 @@ app.use(
 
 // Add security headers middleware
 app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  console.log("Request headers:", req.headers);
+  
+  if (origin) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
   res.header('Access-Control-Allow-Credentials', 'true');
-  res.header('Access-Control-Allow-Origin', req.headers.origin);
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,UPDATE,OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept, Authorization');
+  res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept, Authorization, Cookie');
+  res.header('Access-Control-Max-Age', '86400');
   next();
 });
 

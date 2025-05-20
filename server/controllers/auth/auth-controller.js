@@ -68,6 +68,7 @@ const loginUser = async (req, res) => {
 
   try {
     console.log("Login attempt for email:", email);
+    console.log("Request origin:", req.headers.origin);
 
     // Validate input
     if (!email || !password) {
@@ -128,6 +129,7 @@ const loginUser = async (req, res) => {
       sameSite: "none",
       maxAge: 24 * 60 * 60 * 1000,
       path: "/",
+      domain: process.env.NODE_ENV === "production" ? ".onrender.com" : undefined
     }).json({
       success: true,
       message: "Login successful",
@@ -169,6 +171,9 @@ const logoutUser = async (req, res) => {
 
 //auth middleware
 const authMiddleware = async (req, res, next) => {
+  console.log("Auth middleware - Headers:", req.headers);
+  console.log("Auth middleware - Cookies:", req.cookies);
+  
   const token = req.cookies.token;
   console.log("Auth middleware - Token:", token ? "Present" : "Missing");
   
