@@ -7,8 +7,11 @@ const registerUser = async (req, res) => {
   const { userName, email, password } = req.body;
 
   try {
+    console.log("Registration attempt for:", { email, userName });
+    
     // Validate input
     if (!userName || !email || !password) {
+      console.log("Missing required fields");
       return res.status(400).json({
         success: false,
         message: "All fields are required",
@@ -18,6 +21,7 @@ const registerUser = async (req, res) => {
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
+      console.log("Invalid email format:", email);
       return res.status(400).json({
         success: false,
         message: "Invalid email format",
@@ -26,6 +30,7 @@ const registerUser = async (req, res) => {
 
     // Validate password strength
     if (password.length < 6) {
+      console.log("Password too short");
       return res.status(400).json({
         success: false,
         message: "Password must be at least 6 characters long",
@@ -34,6 +39,7 @@ const registerUser = async (req, res) => {
 
     const checkUser = await User.findOne({ email });
     if (checkUser) {
+      console.log("User already exists:", email);
       return res.status(400).json({
         success: false,
         message: "User already exists with this email",
@@ -45,10 +51,11 @@ const registerUser = async (req, res) => {
       userName,
       email,
       password: hashPassword,
-      role: "user", // Set default role
+      role: "user",
     });
 
     await newUser.save();
+    console.log("User registered successfully:", email);
     res.status(201).json({
       success: true,
       message: "Registration successful! Please login to continue.",
@@ -69,6 +76,7 @@ const loginUser = async (req, res) => {
   try {
     console.log("Login attempt for email:", email);
     console.log("Request origin:", req.headers.origin);
+    console.log("Request headers:", req.headers);
 
     // Validate input
     if (!email || !password) {
@@ -122,15 +130,23 @@ const loginUser = async (req, res) => {
       { expiresIn: "24h" }
     );
 
-    console.log("Login successful, sending response");
-    res.cookie("token", token, {
+    const cookieOptions = {
       httpOnly: true,
       secure: true,
       sameSite: "none",
       maxAge: 24 * 60 * 60 * 1000,
       path: "/",
-      domain: process.env.NODE_ENV === "production" ? ".onrender.com" : undefined
-    }).json({
+    };
+
+    // Set domain based on environment
+    if (process.env.NODE_ENV === "production") {
+      cookieOptions.domain = ".onrender.com";
+    }
+
+    console.log("Setting cookie with options:", cookieOptions);
+    console.log("Login successful, sending response");
+
+    res.cookie("token", token, cookieOptions).json({
       success: true,
       message: "Login successful",
       user: {
@@ -152,12 +168,24 @@ const loginUser = async (req, res) => {
 //logout
 const logoutUser = async (req, res) => {
   try {
-    res.clearCookie("token", {
+    console.log("Logout attempt");
+    console.log("Request origin:", req.headers.origin);
+    console.log("Current cookies:", req.cookies);
+
+    const cookieOptions = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-    }).json({
-    success: true,
+      secure: true,
+      sameSite: "none",
+      path: "/",
+    };
+
+    if (process.env.NODE_ENV === "production") {
+      cookieOptions.domain = ".onrender.com";
+    }
+
+    console.log("Clearing cookie with options:", cookieOptions);
+    res.clearCookie("token", cookieOptions).json({
+      success: true,
       message: "Logged out successfully",
     });
   } catch (e) {
@@ -165,14 +193,17 @@ const logoutUser = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Logout failed. Please try again.",
-  });
+    });
   }
 };
 
 //auth middleware
 const authMiddleware = async (req, res, next) => {
-  console.log("Auth middleware - Headers:", req.headers);
-  console.log("Auth middleware - Cookies:", req.cookies);
+  console.log("Auth middleware - Request details:", {
+    origin: req.headers.origin,
+    cookies: req.cookies,
+    headers: req.headers
+  });
   
   const token = req.cookies.token;
   console.log("Auth middleware - Token:", token ? "Present" : "Missing");

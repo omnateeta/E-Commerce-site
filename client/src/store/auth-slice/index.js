@@ -21,18 +21,34 @@ const api = axios.create({
   }
 });
 
+// Add response interceptor for debugging
+api.interceptors.response.use(
+  (response) => {
+    console.log('API Response:', {
+      url: response.config.url,
+      status: response.status,
+      data: response.data,
+      headers: response.headers
+    });
+    return response;
+  },
+  (error) => {
+    console.error('API Error:', {
+      url: error.config?.url,
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message
+    });
+    return Promise.reject(error);
+  }
+);
+
 export const registerUser = createAsyncThunk(
   "/auth/register",
   async (formData, { rejectWithValue }) => {
     try {
-    const response = await axios.post(
-      `${API_BASE_URL}/api/auth/register`,
-      formData,
-      {
-        withCredentials: true,
-      }
-    );
-    return response.data;
+      const response = await api.post('/api/auth/register', formData);
+      return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || { message: "Registration failed" });
     }
@@ -44,8 +60,6 @@ export const loginUser = createAsyncThunk(
   async (formData, { rejectWithValue }) => {
     try {
       console.log("Attempting login with:", { email: formData.email });
-      console.log("API URL:", `${API_BASE_URL}/api/auth/login`);
-      
       const response = await api.post('/api/auth/login', formData);
       console.log("Login response:", response.data);
       return response.data;
@@ -72,14 +86,8 @@ export const logoutUser = createAsyncThunk(
   "/auth/logout",
   async (_, { rejectWithValue }) => {
     try {
-    const response = await axios.post(
-      `${API_BASE_URL}/api/auth/logout`,
-      {},
-      {
-        withCredentials: true,
-      }
-    );
-    return response.data;
+      const response = await api.post('/api/auth/logout');
+      return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || { message: "Logout failed" });
     }
