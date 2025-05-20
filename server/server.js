@@ -36,15 +36,28 @@ app.use(
       'https://e-commerce-site-frontend.vercel.app',
       'https://e-commerce-site.vercel.app',
       'https://ecommerce-frontend.vercel.app',
-      'https://ecommerce_site_frontend.vercel.app'
+      'https://ecommerce_site_frontend.vercel.app',
+      'https://ecommercefrontend-ten-ochre.vercel.app',
+      'https://ecommercefrontend-ten-ochre.vercel.app/*'
     ],
     methods: ["GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept", "Origin"],
     exposedHeaders: ["Set-Cookie"],
     credentials: true,
     maxAge: 86400, // 24 hours
+    preflightContinue: false,
+    optionsSuccessStatus: 204
   })
 );
+
+// Add security headers middleware
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Allow-Origin', req.headers.origin);
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,UPDATE,OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept, Authorization');
+  next();
+});
 
 app.use(cookieParser());
 app.use(express.json());

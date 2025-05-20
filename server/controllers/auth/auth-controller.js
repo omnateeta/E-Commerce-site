@@ -124,11 +124,10 @@ const loginUser = async (req, res) => {
     console.log("Login successful, sending response");
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      secure: true,
+      sameSite: "none",
+      maxAge: 24 * 60 * 60 * 1000,
       path: "/",
-      domain: "localhost"
     }).json({
       success: true,
       message: "Login successful",
@@ -154,7 +153,7 @@ const logoutUser = async (req, res) => {
     res.clearCookie("token", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     }).json({
     success: true,
       message: "Logged out successfully",
@@ -171,7 +170,10 @@ const logoutUser = async (req, res) => {
 //auth middleware
 const authMiddleware = async (req, res, next) => {
   const token = req.cookies.token;
+  console.log("Auth middleware - Token:", token ? "Present" : "Missing");
+  
   if (!token) {
+    console.log("Auth middleware - No token found");
     return res.status(401).json({
       success: false,
       message: "Authentication required",
@@ -180,6 +182,7 @@ const authMiddleware = async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET || "CLIENT_SECRET_KEY");
+    console.log("Auth middleware - Token verified:", decoded);
     req.user = decoded;
     next();
   } catch (error) {
