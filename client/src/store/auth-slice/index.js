@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+console.log("Current API URL:", API_BASE_URL); // Debug log
 
 const initialState = {
   isAuthenticated: false,
@@ -9,6 +10,16 @@ const initialState = {
   user: null,
   error: null,
 };
+
+// Create axios instance with default config
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  }
+});
 
 export const registerUser = createAsyncThunk(
   "/auth/register",
@@ -35,17 +46,7 @@ export const loginUser = createAsyncThunk(
       console.log("Attempting login with:", { email: formData.email });
       console.log("API URL:", `${API_BASE_URL}/api/auth/login`);
       
-      const response = await axios.post(
-        `${API_BASE_URL}/api/auth/login`,
-        formData,
-        {
-          withCredentials: true,
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-          },
-        }
-      );
+      const response = await api.post('/api/auth/login', formData);
       console.log("Login response:", response.data);
       return response.data;
     } catch (error) {
@@ -57,14 +58,10 @@ export const loginUser = createAsyncThunk(
       });
       
       if (error.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
         return rejectWithValue(error.response.data || { message: "Login failed" });
       } else if (error.request) {
-        // The request was made but no response was received
         return rejectWithValue({ message: "No response from server. Please check your connection." });
       } else {
-        // Something happened in setting up the request that triggered an Error
         return rejectWithValue({ message: error.message || "Login failed" });
       }
     }
@@ -93,17 +90,16 @@ export const checkAuth = createAsyncThunk(
   "/auth/checkauth",
   async (_, { rejectWithValue }) => {
     try {
-    const response = await axios.get(
-      `${API_BASE_URL}/api/auth/check-auth`,
-      {
-        withCredentials: true,
+      console.log("Checking authentication status...");
+      const response = await api.get('/api/auth/check-auth', {
         headers: {
-            "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
         },
-      }
-    );
-    return response.data;
+      });
+      console.log("Auth check response:", response.data);
+      return response.data;
     } catch (error) {
+      console.error("Auth check error:", error.response?.data || error.message);
       return rejectWithValue(error.response?.data || { message: "Authentication check failed" });
     }
   }
