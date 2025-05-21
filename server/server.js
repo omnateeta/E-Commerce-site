@@ -72,7 +72,8 @@ app.use(
       "Accept",
       "Origin",
       "Cookie",
-      "Set-Cookie"
+      "Set-Cookie",
+      "Cache-Control"
     ],
     exposedHeaders: ["Set-Cookie"],
     credentials: true,
@@ -98,7 +99,7 @@ app.use((req, res, next) => {
   }
   res.header('Access-Control-Allow-Credentials', 'true');
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,UPDATE,OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept, Authorization, Cookie, Set-Cookie');
+  res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept, Authorization, Cookie, Set-Cookie, Cache-Control');
   res.header('Access-Control-Max-Age', '86400');
   res.header('Access-Control-Expose-Headers', 'Set-Cookie');
   next();
