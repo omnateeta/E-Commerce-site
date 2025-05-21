@@ -42,13 +42,7 @@ app.use(
   cors({
     origin: function(origin, callback) {
       console.log("CORS request from origin:", origin);
-      console.log("Request headers:", {
-        origin: origin,
-        referer: this.req?.headers?.referer,
-        host: this.req?.headers?.host,
-        cookie: this.req?.headers?.cookie
-      });
-
+      
       // Allow requests with no origin (like mobile apps or curl requests)
       if (!origin) {
         console.log("No origin, allowing request");
@@ -74,7 +68,11 @@ app.use(
       "Cookie",
       "Set-Cookie",
       "Cache-Control",
-      "X-HTTP-Method-Override"
+      "X-HTTP-Method-Override",
+      "Access-Control-Allow-Headers",
+      "Access-Control-Allow-Origin",
+      "Access-Control-Allow-Methods",
+      "Access-Control-Allow-Credentials"
     ],
     exposedHeaders: ["Set-Cookie"],
     credentials: true,
@@ -87,20 +85,13 @@ app.use(
 // Add security headers middleware
 app.use((req, res, next) => {
   const origin = req.headers.origin;
-  console.log("Security headers middleware - Request details:", {
-    origin: origin,
-    headers: req.headers,
-    cookies: req.cookies,
-    method: req.method,
-    path: req.path
-  });
   
   if (origin && allowedOrigins.includes(origin)) {
     res.header('Access-Control-Allow-Origin', origin);
   }
   res.header('Access-Control-Allow-Credentials', 'true');
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,UPDATE,OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept, Authorization, Cookie, Set-Cookie, Cache-Control');
+  res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept, Authorization, Cookie, Set-Cookie, Cache-Control, Access-Control-Allow-Headers, Access-Control-Allow-Origin, Access-Control-Allow-Methods, Access-Control-Allow-Credentials');
   res.header('Access-Control-Max-Age', '86400');
   res.header('Access-Control-Expose-Headers', 'Set-Cookie');
   next();
