@@ -27,21 +27,53 @@ mongoose
   .then(() => console.log("MongoDB connected"))
   .catch((error) => console.log("MongoDB connection error:", error));
 
+// CORS configuration
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://e-commerce-site-frontend.vercel.app',
+  'https://e-commerce-site.vercel.app',
+  'https://ecommerce-frontend.vercel.app',
+  'https://ecommerce_site_frontend.vercel.app',
+  'https://ecommercefrontend-ten-ochre.vercel.app'
+];
 
 // Middleware
 app.use(
   cors({
-    origin: [
-      'http://localhost:5173',
-      'https://e-commerce-site-frontend.vercel.app',
-      'https://e-commerce-site.vercel.app',
-      'https://ecommerce-frontend.vercel.app',
-      'https://ecommerce_site_frontend.vercel.app',
-      'https://ecommercefrontend-ten-ochre.vercel.app',
-      'https://ecommercefrontend-ten-ochre.vercel.app/*'
-    ],
+    origin: function(origin, callback) {
+      console.log("CORS request from origin:", origin);
+      
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) {
+        console.log("No origin, allowing request");
+        return callback(null, true);
+      }
+
+      if (allowedOrigins.indexOf(origin) === -1) {
+        console.log("CORS blocked for origin:", origin);
+        const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+        return callback(new Error(msg), false);
+      }
+
+      console.log("CORS allowed for origin:", origin);
+      return callback(null, true);
+    },
     methods: ["GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept", "Origin"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "X-Requested-With",
+      "Accept",
+      "Origin",
+      "Cookie",
+      "Set-Cookie",
+      "Cache-Control",
+      "X-HTTP-Method-Override",
+      "Access-Control-Allow-Headers",
+      "Access-Control-Allow-Origin",
+      "Access-Control-Allow-Methods",
+      "Access-Control-Allow-Credentials"
+    ],
     exposedHeaders: ["Set-Cookie"],
     credentials: true,
     maxAge: 86400, // 24 hours
@@ -52,10 +84,30 @@ app.use(
 
 // Add security headers middleware
 app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    if (origin && allowedOrigins.includes(origin)) {
+      res.header('Access-Control-Allow-Origin', origin);
+    }
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,UPDATE,OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept, Authorization, Cookie, Set-Cookie, Cache-Control, Access-Control-Allow-Headers, Access-Control-Allow-Origin, Access-Control-Allow-Methods, Access-Control-Allow-Credentials');
+    res.header('Access-Control-Max-Age', '86400');
+    res.header('Access-Control-Expose-Headers', 'Set-Cookie');
+    return res.status(204).end();
+  }
+  
+  // Handle regular requests
+  if (origin && allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
   res.header('Access-Control-Allow-Credentials', 'true');
-  res.header('Access-Control-Allow-Origin', req.headers.origin);
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,UPDATE,OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept, Authorization');
+  res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept, Authorization, Cookie, Set-Cookie, Cache-Control, Access-Control-Allow-Headers, Access-Control-Allow-Origin, Access-Control-Allow-Methods, Access-Control-Allow-Credentials');
+  res.header('Access-Control-Max-Age', '86400');
+  res.header('Access-Control-Expose-Headers', 'Set-Cookie');
   next();
 });
 
@@ -77,4 +129,8 @@ app.use("/api/shop/review", shopReviewRouter);
 app.use("/api/common/feature", commonFeatureRouter);
 
 // Start server
-app.listen(PORT, () => console.log(`Server is now running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server is now running on port ${PORT}`);
+  console.log("Environment:", process.env.NODE_ENV);
+  console.log("Allowed origins:", allowedOrigins);
+});

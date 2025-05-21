@@ -5,7 +5,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { addToCart, fetchCartItems } from "@/store/shop/cart-slice";
 import { fetchProductDetails } from "@/store/shop/products-slice";
 import {
-  getSearchResults,
+  searchProducts,
   resetSearchResults,
 } from "@/store/shop/search-slice";
 import { useEffect, useState } from "react";
@@ -28,7 +28,7 @@ function SearchProducts() {
     if (keyword && keyword.trim() !== "" && keyword.trim().length > 3) {
       setTimeout(() => {
         setSearchParams(new URLSearchParams(`?keyword=${keyword}`));
-        dispatch(getSearchResults(keyword));
+        dispatch(searchProducts(keyword));
       }, 1000);
     } else {
       setSearchParams(new URLSearchParams(`?keyword=${keyword}`));
