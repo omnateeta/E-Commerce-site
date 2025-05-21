@@ -86,6 +86,20 @@ app.use(
 app.use((req, res, next) => {
   const origin = req.headers.origin;
   
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    if (origin && allowedOrigins.includes(origin)) {
+      res.header('Access-Control-Allow-Origin', origin);
+    }
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,UPDATE,OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept, Authorization, Cookie, Set-Cookie, Cache-Control, Access-Control-Allow-Headers, Access-Control-Allow-Origin, Access-Control-Allow-Methods, Access-Control-Allow-Credentials');
+    res.header('Access-Control-Max-Age', '86400');
+    res.header('Access-Control-Expose-Headers', 'Set-Cookie');
+    return res.status(204).end();
+  }
+  
+  // Handle regular requests
   if (origin && allowedOrigins.includes(origin)) {
     res.header('Access-Control-Allow-Origin', origin);
   }

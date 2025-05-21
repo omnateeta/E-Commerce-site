@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "https://ecommerce-backend-4zyh.onrender.com";
 
 // Create axios instance with default config
 const api = axios.create({
@@ -15,8 +15,10 @@ const api = axios.create({
 // Add request interceptor
 api.interceptors.request.use(
   (config) => {
-    // Add cache-control header
-    config.headers['Cache-Control'] = 'no-cache';
+    // Don't add cache-control header for preflight requests
+    if (config.method !== 'options') {
+      config.headers['Cache-Control'] = 'no-cache';
+    }
     return config;
   },
   (error) => {
