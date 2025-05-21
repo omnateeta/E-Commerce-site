@@ -73,7 +73,8 @@ app.use(
       "Origin",
       "Cookie",
       "Set-Cookie",
-      "Cache-Control"
+      "Cache-Control",
+      "X-HTTP-Method-Override"
     ],
     exposedHeaders: ["Set-Cookie"],
     credentials: true,

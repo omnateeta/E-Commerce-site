@@ -1,16 +1,18 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
 const initialState = {
   isLoading: false,
   searchResults: [],
 };
 
-export const getSearchResults = createAsyncThunk(
-  "/order/getSearchResults",
+export const searchProducts = createAsyncThunk(
+  "/search/searchProducts",
   async (keyword) => {
     const response = await axios.get(
-      `http://localhost:5000/api/shop/search/${keyword}`
+      `${API_BASE_URL}/api/shop/search/${keyword}`
     );
 
     return response.data;
@@ -27,14 +29,14 @@ const searchSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(getSearchResults.pending, (state) => {
+      .addCase(searchProducts.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(getSearchResults.fulfilled, (state, action) => {
+      .addCase(searchProducts.fulfilled, (state, action) => {
         state.isLoading = false;
         state.searchResults = action.payload.data;
       })
-      .addCase(getSearchResults.rejected, (state) => {
+      .addCase(searchProducts.rejected, (state) => {
         state.isLoading = false;
         state.searchResults = [];
       });
