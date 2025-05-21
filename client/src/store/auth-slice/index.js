@@ -48,7 +48,7 @@ export const registerUser = createAsyncThunk(
   async (formData, { rejectWithValue }) => {
     try {
       const response = await api.post('/api/auth/register', formData);
-      return response.data;
+    return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || { message: "Registration failed" });
     }
@@ -62,7 +62,7 @@ export const loginUser = createAsyncThunk(
       console.log("Attempting login with:", { email: formData.email });
       const response = await api.post('/api/auth/login', formData);
       console.log("Login response:", response.data);
-      return response.data;
+    return response.data;
     } catch (error) {
       console.error("Login error details:", {
         message: error.message,
@@ -87,7 +87,7 @@ export const logoutUser = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await api.post('/api/auth/logout');
-      return response.data;
+    return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || { message: "Logout failed" });
     }
@@ -101,11 +101,11 @@ export const checkAuth = createAsyncThunk(
       console.log("Checking authentication status...");
       const response = await api.get('/api/auth/check-auth', {
         headers: {
-          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+            "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
         },
       });
       console.log("Auth check response:", response.data);
-      return response.data;
+    return response.data;
     } catch (error) {
       console.error("Auth check error:", error.response?.data || error.message);
       return rejectWithValue(error.response?.data || { message: "Authentication check failed" });

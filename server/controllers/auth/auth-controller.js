@@ -185,7 +185,7 @@ const logoutUser = async (req, res) => {
 
     console.log("Clearing cookie with options:", cookieOptions);
     res.clearCookie("token", cookieOptions).json({
-      success: true,
+    success: true,
       message: "Logged out successfully",
     });
   } catch (e) {
@@ -193,7 +193,7 @@ const logoutUser = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Logout failed. Please try again.",
-    });
+  });
   }
 };
 
