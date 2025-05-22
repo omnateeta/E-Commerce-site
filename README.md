@@ -1,4 +1,4 @@
-# E-Commerce-site
+# E-Commerce-site :
 
 A full-stack e-commerce platform built with the MERN stack (MongoDB, Express.js, React.js, Node.js).
 
