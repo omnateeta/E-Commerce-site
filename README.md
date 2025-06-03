@@ -101,4 +101,4 @@ This project is licensed under the MIT License.
 Developed by Omnateeta V Unnimath.
 - Email: omnateeta3@gmail.com
 - LinkedIn: [Omnateeta V Unnimath](https://www.linkedin.com/in/omnateeta-v-unnimath-0b815b338)
-- GitHub: [omnateeta](https://github.com/omnateeta) 
+- GitHub: [omnateeta](https://github.com/omnateeta)
